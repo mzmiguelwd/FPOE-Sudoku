@@ -3,7 +3,7 @@ package org.example.fpoesudoku;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-public class HelloController {
+public class SudokuController {
     @FXML
     private Label welcomeText;
 
