@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.fpoesudoku.SudokuController">
+   <children>
+      <ImageView fitHeight="49.0" fitWidth="45.0" onMouseClicked="#onActionMouseClickedLightBulb" pickOnBounds="true" preserveRatio="true" translateX="555.0" VBox.vgrow="ALWAYS">
+         <image>
+            <Image url="@images/lightBulb.png" />
+         </image>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </ImageView>
+      <ToolBar prefHeight="40.0" prefWidth="200.0" translateY="305.0" VBox.vgrow="ALWAYS">
+        <items>
+            <Button mnemonicParsing="false" onAction="#onActionStartButton" prefHeight="26.0" prefWidth="66.0" text="START" translateX="200.0" />
+            <ImageView fitHeight="40.0" fitWidth="45.0" onMouseClicked="#onActionMouseClickedQuestionMark" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/questionMark.png" />
+               </image>
+            </ImageView>
+            <Button mnemonicParsing="false" onAction="#onActionRestartButton" prefHeight="26.0" prefWidth="75.0" text="RESTART" translateX="250.0" />
+        </items>
+      </ToolBar>
+   </children>
+</VBox>
