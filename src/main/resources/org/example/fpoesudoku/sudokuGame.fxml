@@ -20,13 +20,14 @@
       <VBox fx:id="rootVBox" prefHeight="287.0" prefWidth="518.0" />
       <ToolBar prefHeight="27.0" prefWidth="600.0" translateY="10.0" VBox.vgrow="ALWAYS">
         <items>
-            <Button mnemonicParsing="false" onAction="#onActionStartButton" prefHeight="26.0" prefWidth="66.0" text="START" translateX="200.0" />
+            <Button mnemonicParsing="false" onAction="#onActionStartButton" prefHeight="26.0" prefWidth="66.0" text="START" translateX="160.0" />
             <ImageView fitHeight="40.0" fitWidth="45.0" onMouseClicked="#onActionMouseClickedQuestionMark" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@images/questionMark.png" />
                </image>
             </ImageView>
-            <Button mnemonicParsing="false" onAction="#onActionRestartButton" prefHeight="26.0" prefWidth="75.0" text="RESTART" translateX="250.0" />
+            <Button mnemonicParsing="false" onAction="#onActionSubmitButton" prefHeight="22.0" prefWidth="74.0" text="submit" translateX="170.0" />
+            <Button mnemonicParsing="false" onAction="#onActionRestartButton" prefHeight="26.0" prefWidth="75.0" text="RESTART" translateX="210.0" />
         </items>
       </ToolBar>
    </children>

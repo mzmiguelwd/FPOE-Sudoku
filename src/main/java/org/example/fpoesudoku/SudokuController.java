@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import org.example.fpoesudoku.models.AlertHelper;
 import org.example.fpoesudoku.models.Sudoku;
 
 import java.util.Random;
@@ -111,12 +112,22 @@ public class SudokuController {
 
     @FXML
     void onActionStartButton(ActionEvent event) {
-        if (sudoku == null) { // Generates a new sudoku only if there's none
+        boolean confirm = AlertHelper.showConfirmationAlert("Confirmation", "do you wish to start the game?");
+        if (confirm) { // Generates a new sudoku only if there's none
             sudoku = new Sudoku();
             sudoku.solveSudoku(); // Generates a valid sudoku (a solved one)
+            System.out.println("initialization started");
+        }
+        else{
+            System.out.println("initialization cancelled");
         }
 
         int[][] sudokuParcial = generarSudokuParcial(sudoku.getSudoku()); // hides some values fot the partial sudoku
         agregarTablero(sudokuParcial); // shows the partial sudoku on the interface
     } //FUNCTION FOR THE START BUTTON (WHAT HAPPENS WHE IT'S CLICKED)
+    @FXML
+    void onActionSubmitButton(ActionEvent event) {
+
+    }
+
 }
