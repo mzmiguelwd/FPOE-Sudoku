@@ -1,4 +1,4 @@
-package org.example.fpoesudoku;
+package org.example.fpoesudoku.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

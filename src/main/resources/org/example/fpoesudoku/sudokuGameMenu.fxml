@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.fpoesudoku.models.SudokuGameMenuController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.fpoesudoku.controllers.SudokuGameMenuController">
    <children>
       <ImageView fitHeight="168.0" fitWidth="224.0" pickOnBounds="true" preserveRatio="true" scaleZ="0.0" translateX="190.0" translateY="60.0" VBox.vgrow="ALWAYS">
          <image>
