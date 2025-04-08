@@ -3,71 +3,98 @@ package org.example.fpoesudoku.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.example.fpoesudoku.models.AlertHelper;
 import org.example.fpoesudoku.models.Sudoku;
-
 import java.util.Random;
-
-// gameController
+import java.util.function.UnaryOperator;
 
 public class SudokuGameController {
-    @FXML
-    private Label welcomeText;
-
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
-
 
     @FXML
     private VBox rootVBox; // VBox reference
-    @FXML
-    private Button startButton; // Start button reference
-    @FXML
-    private Button restartButton; // Restart button reference
 
     private static final int SIZE = 6;
     private Sudoku sudoku;
 
-
-
     private void agregarTablero(int[][] tablero) {
-        rootVBox.getChildren().removeIf(node -> node instanceof GridPane); //removes the grid pane to avoid duplicates
-        GridPane gridPane = new GridPane();//generates a new Grid pane
+        // Eliminar cualquier GridPane existente para evitar duplicados
+        rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
+
+        // Crea un nuevo GridPane para el tablero
+        GridPane gridPane = new GridPane();
         gridPane.setHgap(5);
         gridPane.setVgap(5);
-        gridPane.setAlignment(Pos.CENTER); // centers the grid pane
+        gridPane.setAlignment(Pos.CENTER);
         gridPane.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
 
+        // Recorre cada celda de la matriz para crear los TextFields
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 6; col++) {
                 TextField textField = new TextField();
                 textField.setPrefSize(40, 40);
                 textField.setAlignment(javafx.geometry.Pos.CENTER);
-                textField.setStyle("-fx-font-size: 18px;"); //generates the field texts
+                textField.setStyle("-fx-font-size: 18px;");
 
-                if (tablero[row][col] != 0) {
-                    textField.setText(String.valueOf(tablero[row][col]));
+                boolean isShadedBlock = (row / 2 + col / 3) % 2 == 0;
+                int value = tablero[row][col];
+
+                if (value != 0) {
+                    textField.setText(String.valueOf(value));
                     textField.setEditable(false);
-                    textField.setStyle("-fx-background-color: lightgray; -fx-font-size: 18px; -fx-alignment: center;");
-                } //Makes the default sudoku numbers non editable
+                    textField.setPrefSize(40, 40);
+                    textField.setMinSize(40, 40);
+                    textField.setMaxSize(40, 40);
+                    textField.setStyle(
+                            (isShadedBlock ? "-fx-background-color: #d3d3d3;" : "-fx-background-color: lightgray;") +
+                                    " -fx-font-size: 18px;" +
+                                    " -fx-alignment: center;" +
+                                    " -fx-border-color: black;" +
+                                    " -fx-border-width: 1;" +
+                                    " -fx-background-insets: 0;" +
+                                    " -fx-padding: 0;"
+                    );
+                } else {
+                    textField.setEditable(true);
+                    textField.setPrefSize(40, 40);
+                    textField.setMinSize(40, 40);
+                    textField.setMaxSize(40, 40);
 
-                gridPane.add(textField, col, row); //Adds the text fields into the grid pane (by columns and rows)
+                    String background = isShadedBlock ? "#f2f2f2" : "white";
+                    textField.setStyle(
+                            "-fx-background-color: " + background + ";" +
+                                    " -fx-font-size: 18px;" +
+                                    " -fx-alignment: center;" +
+                                    " -fx-border-color: black;" +
+                                    " -fx-border-width: 1;" +
+                                    " -fx-background-insets: 0;" +
+                                    " -fx-padding: 0;"
+                    );
+
+                    // solo permite números del 1 al 6
+                    UnaryOperator<TextFormatter.Change> filter = change -> {
+                        String newText = change.getControlNewText();
+                        if (newText.matches("[1-6]?")) {
+                            return change;
+                        }
+                        return null;
+                    };
+                    textField.setTextFormatter(new TextFormatter<>(filter));
+                }
+
+                gridPane.add(textField, col, row);
             }
         }
 
+        // Agrega el tablero en la parte superior del VBox
+        rootVBox.getChildren().add(0, gridPane);
 
-
-        rootVBox.getChildren().add(0, gridPane); //adds the grid pane to the vBox
     }
+
     private int[][] generarSudokuParcial(int[][] sudokuCompleto) {
         int[][] sudokuParcial = new int[6][6];
 
@@ -92,39 +119,45 @@ public class SudokuGameController {
         return sudokuParcial;
     }
 
-
-
     @FXML
     void onActionMouseClickedLightBulb(MouseEvent event) {
 
-    } // THE FUNCTION THAT GIVES THE HELP TO COMPLETE PART OF THE SUDOKU
+    } // Function to handles the light bulb: help to complete part of the sudoku
 
     @FXML
     void onActionMouseClickedQuestionMark(MouseEvent event) {
 
-    }//FUNCTION FOR THE QUESTION MARK (WHAT HAPPENS WHEN IT'S CLICKED)
-
+    } // Function to handles the question mark
 
     @FXML
     void onActionRestartButton(ActionEvent event) {
 
-    } //FUNCTION FOR THE RESTART BUTTON (WHAT HAPPENS WHEN IT'S CLICKED)
+    } // Function to handles the Restart button click
 
     @FXML
-    void onActionStartButton(ActionEvent event) {
-        boolean confirm = AlertHelper.showConfirmationAlert("Confirmation", "do you wish to start the game?");
-        if (confirm) { // Generates a new sudoku only if there's none
-            sudoku = new Sudoku();
-            sudoku.solveSudoku(); // Generates a valid sudoku (a solved one)
-            System.out.println("initialization started");
-        }
-        else{
-            System.out.println("initialization cancelled");
-        }
+    void onActionStartGameButton(ActionEvent event) {
+        // Ask the user to confirm if they want to start the game
+        boolean confirm = AlertHelper.showConfirmationAlert("Confirmación", "¿Seguro que quieres iniciar el juego?");
 
-        int[][] sudokuParcial = generarSudokuParcial(sudoku.getSudoku()); // hides some values fot the partial sudoku
-        agregarTablero(sudokuParcial); // shows the partial sudoku on the interface
-    } //FUNCTION FOR THE START BUTTON (WHAT HAPPENS WHE IT'S CLICKED)
+        if (confirm) {
+            // Create a new Sudoku instance
+            sudoku = new Sudoku();
+
+            // Generate a valid, fully solved Sudoku board
+            sudoku.solveSudoku();
+
+            // Generate a partially hidden Sudoku based on the solved board
+            int[][] sudokuParcial = generarSudokuParcial(sudoku.getSudoku());
+
+            // Display the partially completed Sudoku board on the UI
+            agregarTablero(sudokuParcial);
+
+            System.out.println("Initialization started");
+        } else {
+            System.out.println("Initialization cancelled");
+        }
+    }
+
     @FXML
     void onActionSubmitButton(ActionEvent event) {
 
