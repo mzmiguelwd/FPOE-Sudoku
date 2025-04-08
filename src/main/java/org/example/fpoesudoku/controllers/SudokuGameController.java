@@ -17,7 +17,7 @@ import java.util.Random;
 
 // gameController
 
-public class SudokuController {
+public class SudokuGameController {
     @FXML
     private Label welcomeText;
 

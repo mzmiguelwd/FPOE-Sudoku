@@ -11,5 +11,6 @@ module org.example.fpoesudoku {
     opens org.example.fpoesudoku.views to javafx.fxml;
     exports org.example.fpoesudoku.controllers;
     opens org.example.fpoesudoku.controllers to javafx.fxml;
+    exports org.example.fpoesudoku;
 
 }

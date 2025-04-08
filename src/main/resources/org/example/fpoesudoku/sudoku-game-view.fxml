@@ -6,13 +6,13 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.fpoesudoku.controllers.SudokuController">
+<VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.fpoesudoku.controllers.SudokuGameController">
    <children>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
          <items>
             <ImageView fitHeight="49.0" fitWidth="45.0" onMouseClicked="#onActionMouseClickedLightBulb" pickOnBounds="true" preserveRatio="true" translateX="550.0">
                <image>
-                  <Image url="@images/lightBulb.png" />
+                  <Image url="@images/light-bulb.png" />
                </image>
             </ImageView>
          </items>
@@ -23,7 +23,7 @@
             <Button mnemonicParsing="false" onAction="#onActionStartButton" prefHeight="26.0" prefWidth="66.0" text="START" translateX="160.0" />
             <ImageView fitHeight="40.0" fitWidth="45.0" onMouseClicked="#onActionMouseClickedQuestionMark" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@images/questionMark.png" />
+                  <Image url="@images/question-mark.png" />
                </image>
             </ImageView>
             <Button mnemonicParsing="false" onAction="#onActionSubmitButton" prefHeight="22.0" prefWidth="74.0" text="submit" translateX="170.0" />
