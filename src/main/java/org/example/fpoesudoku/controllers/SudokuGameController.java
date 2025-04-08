@@ -21,18 +21,18 @@ public class SudokuGameController {
     private static final int SIZE = 6;
     private Sudoku sudoku;
 
-    private void agregarTablero(int[][] tablero) {
-        // Eliminar cualquier GridPane existente para evitar duplicados
+    private void addBoard(int[][] tablero) {
+        // Remove any existing GridPane to avoid duplicates
         rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
 
-        // Crea un nuevo GridPane para el tablero
+        // Create a new GridPane for the board
         GridPane gridPane = new GridPane();
         gridPane.setHgap(5);
         gridPane.setVgap(5);
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
 
-        // Recorre cada celda de la matriz para crear los TextFields
+        // Loop through each cell of the matrix to create TextFields
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 6; col++) {
                 TextField textField = new TextField();
@@ -75,7 +75,7 @@ public class SudokuGameController {
                                     " -fx-padding: 0;"
                     );
 
-                    // solo permite números del 1 al 6
+                    // Only allow numbers from 1 to 6
                     UnaryOperator<TextFormatter.Change> filter = change -> {
                         String newText = change.getControlNewText();
                         if (newText.matches("[1-6]?")) {
@@ -90,33 +90,33 @@ public class SudokuGameController {
             }
         }
 
-        // Agrega el tablero en la parte superior del VBox
+        // Add the board to the VBox
         rootVBox.getChildren().add(0, gridPane);
-
     }
 
-    private int[][] generarSudokuParcial(int[][] sudokuCompleto) {
-        int[][] sudokuParcial = new int[6][6];
+    private int[][] generatePartialSudoku(int[][] completeSudoku) {
+        int[][] partialSudoku = new int[6][6];
 
-        // Copies the solved sudoku
+        // Copy the complete Sudoku into the new partial board
         for (int i = 0; i < 6; i++) {
-            System.arraycopy(sudokuCompleto[i], 0, sudokuParcial[i], 0, 6);
+            System.arraycopy(completeSudoku[i], 0, partialSudoku[i], 0, 6);
         }
 
         Random random = new Random();
-        int celdasAEliminar = 12; // Number of empty cells (empty cells we want per sudoku)
+        int cellsToRemove = 12; // Number of cells to empty
 
-        while (celdasAEliminar > 0) {
+        // Randomly remove numbers from the board until the desired amount is reached
+        while (cellsToRemove > 0) {
             int row = random.nextInt(6);
             int col = random.nextInt(6);
 
-            if (sudokuParcial[row][col] != 0) {
-                sudokuParcial[row][col] = 0; // Deletes the number
-                celdasAEliminar--;
+            if (partialSudoku[row][col] != 0) {
+                partialSudoku[row][col] = 0; // Empty the cell
+                cellsToRemove--;
             }
         }
 
-        return sudokuParcial;
+        return partialSudoku;
     }
 
     @FXML
@@ -147,10 +147,10 @@ public class SudokuGameController {
             sudoku.solveSudoku();
 
             // Generate a partially hidden Sudoku based on the solved board
-            int[][] sudokuParcial = generarSudokuParcial(sudoku.getSudoku());
+            int[][] sudokuParcial = generatePartialSudoku(sudoku.getSudoku());
 
             // Display the partially completed Sudoku board on the UI
-            agregarTablero(sudokuParcial);
+            addBoard(sudokuParcial);
 
             System.out.println("Initialization started");
         } else {
