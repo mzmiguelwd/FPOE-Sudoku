@@ -10,8 +10,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.example.fpoesudoku.models.AlertHelper;
 import org.example.fpoesudoku.models.Sudoku;
-import java.util.Random;
+
+import java.util.*;
 import java.util.function.UnaryOperator;
+
+
 
 public class SudokuGameController {
     @FXML
@@ -21,6 +24,20 @@ public class SudokuGameController {
 
     private static final int SIZE = 6;
     private Sudoku sudoku;
+
+
+    @FXML
+    int[][] sudokuParcial; //Copy of the sudoku gridPane (used in the start button logic)
+
+
+    public void imprimirSudoku(int[][] tablero) {
+        for (int i = 0; i < tablero.length; i++) {
+            for (int j = 0; j < tablero[i].length; j++) {
+                System.out.print(tablero[i][j] + " ");
+            }
+            System.out.println(); //functions to print the sudokus
+        }
+    }
 
     private void addBoard(int[][] tablero) {
         // Remove any existing GridPane to avoid duplicates
@@ -116,15 +133,83 @@ public class SudokuGameController {
                 cellsToRemove--;
             }
         }
+        sudokuParcial=partialSudoku;
+        imprimirSudoku(sudokuParcial);
 
         return partialSudoku;
     }
 
     @FXML
     void onActionMouseClickedLightBulb(MouseEvent event) {
+        int nEmptyCells=2;//number of the cells that will always be empty
+        if (sudoku == null || sudokuParcial == null) {
+            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
+            return;
+        }
+
+        // Obtener el GridPane desde el VBox
+        GridPane gridPane = null;
+        for (javafx.scene.Node node : rootVBox.getChildren()) {
+            if (node instanceof GridPane) {
+                gridPane = (GridPane) node;
+                break;
+            }
+        }
+
+        if (gridPane == null) {
+            alertHelper.showErrorAlert("Error","", "No se encontró el tablero.");
+            return;
+        }
+
+        // Search for the empty cells
+        List<int[]> emptyCells = new ArrayList<>();
+
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (sudokuParcial[i][j] == 0) {
+                    emptyCells.add(new int[]{i, j});
+
+                }
+            }
+        }
+
+        if (emptyCells.isEmpty()) {
+            alertHelper.showInfoAlert("Sin espacios vacíos","", "Ya no hay celdas vacías para ayudar.");
+            return;
+        }
+        if(emptyCells.size()>nEmptyCells) {
+            // Seleccionar una celda vacía aleatoria
+            Random rand = new Random();
+            int[] cell = emptyCells.get(rand.nextInt(emptyCells.size()));
+            int row = cell[0];
+            int col = cell[1];
+
+            // Tomar el valor correcto y actualizar el tablero
+            int correctValue = sudoku.getSudoku()[row][col];
+            sudokuParcial[row][col] = correctValue;
+
+            // Actualizar el TextField correspondiente en el GridPane
+            for (javafx.scene.Node node : gridPane.getChildren()) {
+                if (GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == col && node instanceof TextField) {
+                    TextField tf = (TextField) node;
+                    tf.setText(String.valueOf(correctValue));
+                    tf.setEditable(false);
+                    tf.setStyle(tf.getStyle() + "; -fx-text-fill: green;"); // Shows the help in green
+                    break;
+                }
+            }
+
+            System.out.println("Ayuda aplicada en [" + row + "," + col + "] = " + correctValue);
+        }
+        if (emptyCells.size() <= nEmptyCells) {
+            alertHelper.showWarningAlert("advertencia","ya no te quedan ayudas");
+        }
+
 
     } // Function to handles the light bulb: help to complete part of the sudoku
-
+        /*the function creates a copy from the current board then adds a valid value
+        and uses the index to update the original grid pane with the valid value
+        */
     @FXML
     void onActionMouseClickedQuestionMark(MouseEvent event) {
     alertHelper.showInfoAlert("Instrucciones del juego","instrucciones del sudoku 6x6","1. El tablero está compuesto por 6 filas y 6 columnas, formando un total de 36 casillas.\n" +
