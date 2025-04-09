@@ -25,7 +25,7 @@ public class SudokuWelcomeController {
                 cumplir con las reglas.
                 """;
 
-        AlertHelper.showInfoAlert("Sudoku - Descripción", description);
+        AlertHelper.showInfoAlert("Sudoku - Descripción",null, description);
 
         try {
             // Load the game interface from the FXML file
