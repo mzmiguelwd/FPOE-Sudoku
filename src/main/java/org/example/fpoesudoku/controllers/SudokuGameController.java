@@ -14,7 +14,8 @@ import java.util.Random;
 import java.util.function.UnaryOperator;
 
 public class SudokuGameController {
-
+    @FXML
+    AlertHelper alertHelper=new AlertHelper();
     @FXML
     private VBox rootVBox; // VBox reference
 
@@ -126,7 +127,19 @@ public class SudokuGameController {
 
     @FXML
     void onActionMouseClickedQuestionMark(MouseEvent event) {
-
+    alertHelper.showInfoAlert("Instrucciones del juego","instrucciones del sudoku 6x6","1. El tablero está compuesto por 6 filas y 6 columnas, formando un total de 36 casillas.\n" +
+            "\n" +
+            "2. El tablero se divide en 6 regiones de igual tamaño, de 3x2 (3 columnas por 2 filas) o 2x3, según el diseño.\n" +
+            "\n" +
+            "3. Debes llenar todas las casillas con números del 1 al 6, siguiendo estas reglas:\n" +
+            "\n" +
+            "4. Cada fila debe contener los números del 1 al 6 sin repetir.\n" +
+            "\n" +
+            "5. Cada columna debe contener los números del 1 al 6 sin repetir.\n" +
+            "\n" +
+            "6. Cada región debe contener los números del 1 al 6 sin repetir.\n" +
+            "\n" +
+            "7. No hay soluciones múltiples: cada tablero tiene una única solución correcta");
     } // Function to handles the question mark
 
     @FXML
