@@ -238,13 +238,22 @@ public class SudokuGameController {
 
     @FXML
     void onActionRestartButton(ActionEvent event) {
+        rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
+
         if (sudoku == null || sudokuParcial == null) {
             alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
             System.out.println("No existe ningun tablero...");
             return;
+
         }
+        //Copy of the initial sudoku to avoid modifying it so the sudoku restarts correctly
+        int[][] nuevoParcial = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            System.arraycopy(sudokuInicial[i], 0, nuevoParcial[i], 0, 6);
+        }
+        sudokuParcial = nuevoParcial;
         rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
-        addBoard(sudokuInicial);
+        addBoard(sudokuParcial);
 
 
     } // Function to handles the Restart button click
