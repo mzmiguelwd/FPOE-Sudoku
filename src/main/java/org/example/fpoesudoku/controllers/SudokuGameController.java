@@ -28,6 +28,7 @@ public class SudokuGameController {
 
     @FXML
     int[][] sudokuParcial; //Copy of the sudoku gridPane (used in the start button logic)
+    int[][] sudokuInicial; //Copy of the first stage of the sudoku (used for the restart button logic)
 
 
     public void imprimirSudoku(int[][] tablero) {
@@ -110,6 +111,7 @@ public class SudokuGameController {
 
         // Add the board to the VBox
         rootVBox.getChildren().add(0, gridPane);
+        System.out.println("Tablero añadido...");
     }
 
     private int[][] generatePartialSudoku(int[][] completeSudoku) {
@@ -135,6 +137,12 @@ public class SudokuGameController {
         }
         sudokuParcial=partialSudoku;
         imprimirSudoku(sudokuParcial);
+        //copy of the primary stage of the sudoku that is not affected by any functions
+        sudokuInicial = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            System.arraycopy(partialSudoku[i], 0, sudokuInicial[i], 0, 6);
+        }
+        System.out.println("copia de la fase inicial del sudoku echa...");
 
         return partialSudoku;
     }
@@ -144,10 +152,11 @@ public class SudokuGameController {
         int nEmptyCells=2;//number of the cells that will always be empty
         if (sudoku == null || sudokuParcial == null) {
             alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
+            System.out.println("No existe ningun tablero...");
             return;
         }
 
-        // Obtener el GridPane desde el VBox
+        // Gets the grid pane
         GridPane gridPane = null;
         for (javafx.scene.Node node : rootVBox.getChildren()) {
             if (node instanceof GridPane) {
@@ -173,22 +182,19 @@ public class SudokuGameController {
             }
         }
 
-        if (emptyCells.isEmpty()) {
-            alertHelper.showInfoAlert("Sin espacios vacíos","", "Ya no hay celdas vacías para ayudar.");
-            return;
-        }
+
         if(emptyCells.size()>nEmptyCells) {
-            // Seleccionar una celda vacía aleatoria
+            // Selects a random empty cell
             Random rand = new Random();
             int[] cell = emptyCells.get(rand.nextInt(emptyCells.size()));
             int row = cell[0];
             int col = cell[1];
 
-            // Tomar el valor correcto y actualizar el tablero
+            // Takes the right value and updates the sudoku
             int correctValue = sudoku.getSudoku()[row][col];
             sudokuParcial[row][col] = correctValue;
 
-            // Actualizar el TextField correspondiente en el GridPane
+            // Updates the textfield
             for (javafx.scene.Node node : gridPane.getChildren()) {
                 if (GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == col && node instanceof TextField) {
                     TextField tf = (TextField) node;
@@ -203,6 +209,9 @@ public class SudokuGameController {
         }
         if (emptyCells.size() <= nEmptyCells) {
             alertHelper.showWarningAlert("advertencia","ya no te quedan ayudas");
+            System.out.println("Ya no te quedan ayudas...");
+
+
         }
 
 
@@ -229,6 +238,14 @@ public class SudokuGameController {
 
     @FXML
     void onActionRestartButton(ActionEvent event) {
+        if (sudoku == null || sudokuParcial == null) {
+            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
+            System.out.println("No existe ningun tablero...");
+            return;
+        }
+        rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
+        addBoard(sudokuInicial);
+
 
     } // Function to handles the Restart button click
 
