@@ -1,20 +1,16 @@
 package org.example.fpoesudoku.models;
 
 /**
- * esta clase se encarga de manejar los sudokus
+ * Represents a 6x6 Sudoku puzzle and provides methods to solve and validate it.
  */
 public class Sudoku {
 
     private int sudoku [][];
 
     /**
-     * este metodo define la estructura del sudoku inicial
+     * Initializes an empty 6x6 Sudoku grid with all cells set to 0.
      */
     public Sudoku() {
-        /**
-         * @param sudo
-         * @return sudoku
-         */
         int sudo[][] = {
                 {0, 0, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0},
@@ -27,14 +23,11 @@ public class Sudoku {
     }
 
     /**
-     +Esta clase se encarga de resolver el sudoku
+     * Solves the current Sudoku using backtracking.
+     *
+     * @return {@code true} if a solution is found, {@code false} otherwise.
      */
     public boolean solveSudoku() {
-        /**
-         * @param row
-         * @param col
-         * @return el tablero resuelto si es posiblo si no retorna false
-         */
         for (int row = 0; row < 6; row++) { // Iterate through each row
             for (int col = 0; col < 6; col++) { // Iterate through each column
                 if (sudoku[row][col] == 0) { // Check for an empty cell (value 0)
@@ -58,12 +51,9 @@ public class Sudoku {
     }
 
     /**
-     * clase encargada de mostrar el sudoku en su instansia resuelta
+     * Solves and prints the Sudoku grid to the console.
      */
     public void showSudoku() {
-        /**
-         * @param sudoku
-         */
         solveSudoku(); // Solve the Sudoku before displaying it
 
         for (int row = 0; row < 6; row++) { // Iterate through each row of the Sudoku
@@ -75,15 +65,14 @@ public class Sudoku {
     }
 
     /**
-     *Metodo encargado de validar si un movimiento echo en el sudoku es valido
+     * Checks whether placing a value at a given position is valid.
+     *
+     * @param row    The row index.
+     * @param column The column index.
+     * @param value  The value to place.
+     * @return {@code true} if the move is valid, {@code false} otherwise.
      */
     private boolean validMovement(int row, int column, int value) {
-        /**
-         * @param row
-         * @param column
-         * @param value
-         * @return true si el movimiento es valido y false si no lo es
-         */
         // Check if the value is valid in the row, column, and sub-quadrant
         return validateRow(row, value) &&
             validateColumn(column, value) &&
@@ -91,14 +80,13 @@ public class Sudoku {
     }
 
     /**
-     *Funcion encargada de validar una fila
+     * Validates whether a value can be placed in a specific row.
+     *
+     * @param row   The row index.
+     * @param value The value to check.
+     * @return {@code true} if the value does not exist in the row.
      */
     public boolean validateRow(int row, int value) {
-        /**
-         * @param row
-         * @param value
-         * @return true si las fila es valida
-         */
         // Validate the existence of the value in the row
         for (int i = 0; i < 6; i++) { // Iterate through all 6 columns in the given row
             if (sudoku[row][i] == value) { // Check if the value already exists in the row
@@ -109,15 +97,13 @@ public class Sudoku {
     }
 
     /**
-     *Metodo encargado de verificar la columna
+     * Validates whether a value can be placed in a specific column.
+     *
+     * @param column The column index.
+     * @param value  The value to check.
+     * @return {@code true} if the value does not exist in the column.
      */
     public boolean validateColumn(int column, int value) {
-        /**
-         *
-         * @param column
-         * @param value
-         * @return true si la columna es valida
-         */
         // Validate the existence of the value in the column
         for (int i = 0; i < 6; i++) { // Iterate through all 6 rows in the given column
             if (sudoku[i][column] == value) { // Check if the value exists in the column
@@ -128,16 +114,14 @@ public class Sudoku {
     }
 
     /**
-     *Metodo encargado de validar un cuadrante
+     * Validates whether a value can be placed in the corresponding 2x3 sub-quadrant.
+     *
+     * @param row    The row index.
+     * @param column The column index.
+     * @param value  The value to check.
+     * @return {@code true} if the value does not exist in the quadrant.
      */
     public boolean validateQuadrant(int row, int column, int value) {
-        /**
-         *
-         * @param row
-         * @param column
-         * @param value
-         * @return true si el cuadrante es correcto o valido
-         */
         // Get the current quadrant
         int subQuadrant = currentQuadrant(row, column);
 
@@ -157,15 +141,13 @@ public class Sudoku {
     }
 
     /**
-     *Metodo encargado determinar los cuadrantes
+     * Determines the sub-quadrant (1 to 6) of a given cell.
+     *
+     * @param row    The row index.
+     * @param column The column index.
+     * @return The quadrant number (1 to 6).
      */
     public static int currentQuadrant(int row, int column) {
-        /**
-         *
-         * @param row
-         * @param column
-         * @return la fila y la columna del cuadrante
-         */
         // Determine the row of the sub-quadrant (0, 1 o 2)
         int currentQuadrantRow = row / 2;
 
@@ -177,11 +159,19 @@ public class Sudoku {
     }
 
     /**
-     *Getter que retorna el sudoku
+     * Returns the current Sudoku grid.
+     *
+     * @return A 2D array representing the Sudoku grid.
      */
     public int [][] getSudoku() { return sudoku; }
+
     /**
-     *setter del sudoku
+     * Sets a custom Sudoky grid.
+     *
+     * @param sudoku A 2D array to replace the current grid.
      */
-    public void setSudoku(int[][] sudoku) { this.sudoku = sudoku; }
+    public void setSudoku(int[][] sudoku) {
+        this.sudoku = sudoku;
+    }
+
 }

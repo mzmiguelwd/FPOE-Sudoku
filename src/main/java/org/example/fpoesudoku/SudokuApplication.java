@@ -9,11 +9,19 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
- * se encarga de la vista
- * muestra el menu, define el icono para la aplicacion
+ * Main application class for the Sudoku game.
+ * This class handles the initial setup and launch of the user interface.
+ * It loads the welcome menu and sets an icon for the application window.
  */
 public class SudokuApplication extends Application {
 
+    /**
+     * Starts the JavaFX application.
+     * Loads the welcome screen from FXML, sets the icon, window title, and other properties.
+     *
+     * @param stage the primary stage for this application
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @Override
     public void start(Stage stage) throws IOException {
         // Load the main menu interface from the FXML file
@@ -33,6 +41,11 @@ public class SudokuApplication extends Application {
         stage.show();
     }
 
+    /**
+     * Launches the application.
+     *
+     * @param args the command-line arguments (not-used)
+     */
     public static void main(String[] args) {
         launch();
     }

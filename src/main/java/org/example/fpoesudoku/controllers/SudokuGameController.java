@@ -15,23 +15,31 @@ import org.example.fpoesudoku.models.Sudoku;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
+/**
+ * Main controller for the 6x6 Sudoku game.
+ * Manages the interaction logic between the view and the game model.
+ */
 public class SudokuGameController {
 
     @FXML
     AlertHelper alertHelper = new AlertHelper();
 
     @FXML
-    private VBox rootVBox; // VBox reference
+    private VBox rootVBox; // Main container for the Sudoku board
 
     private static final int SIZE = 6;
     private Sudoku sudoku;
     private GridPane boardGrid;
 
     @FXML
-    int[][] sudokuPartial; //Copy of the sudoku gridPane (used in the start button logic)
-    int[][] sudokuInitial; //Copy of the first stage of the sudoku (used for the restart button logic)
+    int[][] sudokuPartial; // Copy of the current Sudoku board with some cells removed
+    int[][] sudokuInitial; // Copy of the initial state of the Sudoku board (for resets)
 
-    // Function to print the Sudoku board
+    /**
+     * Prints the Sudoku board to the console (for debugging purposes).
+     *
+     * @param board the Sudoku board to print
+     */
     public void printSudoku(int[][] board) {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -41,6 +49,12 @@ public class SudokuGameController {
         }
     }
 
+    /**
+     * Dynamically adds the Sudoku board to the view as a grid of TextFields.
+     * Removes any previous board and creates a new one with styles and input validation.
+     *
+     * @param board the matrix representing the board to display
+     */
     private void addBoard(int[][] board) {
         // Remove any existing GridPane to avoid duplicates
         rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
@@ -186,6 +200,13 @@ public class SudokuGameController {
         });
     }
 
+    /**
+     * Generates a partial version of the complete Sudoku board by
+     * removing exactly 4 cells per 2x3 region.
+     *
+     * @param completeSudoku the fully solved Sudoku board.
+     * @return a matrix with some cells empty (represented by zeros).
+     */
     private int[][] generatePartialSudoku(int[][] completeSudoku) {
         int[][] partialSudoku = new int[6][6];
 
@@ -229,7 +250,12 @@ public class SudokuGameController {
         return partialSudoku;
     }
 
-    // Function that handles the light bulb: provides a hint by revealing a valid cell in the Sudoku
+    /**
+     * Reveals a hint to the player by filling in a random empty cell
+     * with its correct value. Only available if more than two cells remain empty.
+     *
+     * @param event mouse click event on the lightbulb icon
+     */
     @FXML
     void onActionMouseClickedLightBulb(MouseEvent event) {
         int minRemainingCells = 2; // Minimum number of empty cells before hints are disabled
@@ -296,7 +322,11 @@ public class SudokuGameController {
 
     }
 
-    // Function that handles the question mark button: displays game instructions
+    /**
+     * Displays an informational alert with the game instructions.
+     *
+     * @param event mouse click event on the question mark icon.
+     */
     @FXML
     void onActionMouseClickedQuestionMark(MouseEvent event) {
         String title = "Instrucciones del juego";
@@ -312,7 +342,12 @@ public class SudokuGameController {
         alertHelper.showInfoAlert(title, header, content);
     }
 
-    // Function that handles the Restart button click: resets the Sudoku board to its initial state
+    /**
+     * Resets the current game to its initial state,
+     * restoring the board to the version shown at the beginning.
+     *
+     * @param event button click event on the "Resetear" button.
+     */
     @FXML
     void onActionRestartButton(ActionEvent event) {
         // Remove the current board if it exists
@@ -336,6 +371,13 @@ public class SudokuGameController {
         addBoard(sudokuPartial);
     }
 
+    /**
+     * Starts a new Sudoku game after user confirmation.
+     * It initializes a new Sudoku object, generates a solved board,
+     * creates a partially hidden version, and displays it on the screen.
+     *
+     * @param event button click event on the "Iniciar" button
+     */
     @FXML
     void onActionStartGameButton(ActionEvent event) {
         // Ask the user to confirm if they want to start the game
@@ -360,7 +402,13 @@ public class SudokuGameController {
         }
     }
 
-    // Function that handles the "Validar" button: checks if the user has completed the Sudoku correctly
+    /**
+     * Validates the current state of the Sudoku board entered by the user.
+     * If the board matches the solved version, a success alert is shown.
+     * Otherwise, an error alert indicates the puzzle is not yet solved.
+     *
+     * @param event button click event on the "Validate" button
+     */
     @FXML
     void onActionValidateButton(ActionEvent event) {
         // Check if a game has started

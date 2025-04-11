@@ -7,22 +7,19 @@ import javafx.scene.layout.Region;
 import java.util.Optional;
 
 /**
- * Esta clase se encarga de manejar todas las alertas
+ * Utility class responsible for displaying different types of alerts
+ * (confirmation, information, error, and warning) in the user interface.
  */
 public class AlertHelper {
 
-    // Method to show a confirmation alert and returns true if the user clicks OK
-    // Used for the "Empezar" button message confirmation
-
     /**
-     *metodo encargado de mostrar alertas de confirmacion
+     * Displays a confirmation alert with "Iniciar" and "Cancelar" buttons.
+     *
+     * @param title   The title of the alert.
+     * @param message The message displayed in the alert body.
+     * return {@code true} if the user clicks "Iniciar", {@code false} otherwise.
      */
     public static boolean showConfirmationAlert(String title, String message) {
-        /**
-         * @param title
-         * @param message
-         */
-
         // Custom buttons
         ButtonType yesButton = new ButtonType("Iniciar");
         ButtonType noButton = new ButtonType("Cancelar");
@@ -36,17 +33,14 @@ public class AlertHelper {
         return result.isPresent() && result.get() == yesButton;
     }
 
-    // Method to show an information alert
-
     /**
-     *Metodo encargado de mostrar alertas de informacion
+     * Displays an informational alert.
+     *
+     * @param title   The title of the alert.
+     * @param header  The header text of the alert.
+     * @param message The message displayed in the alert body.
      */
     public static void showInfoAlert(String title,String header, String message) {
-        /**
-         * @param title
-         * @param header
-         * @param message
-         */
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -59,18 +53,14 @@ public class AlertHelper {
         alert.showAndWait();
     }
 
-    // Method to show an error alert
-
     /**
+     * Displays an error alert.
      *
-     *Metodo encargado de mostrar alertas de error
+     * @param title   The title of the alert.
+     * @param header  The header text of the alert.
+     * @param message The message displayed in the alert body.
      */
     public static void showErrorAlert(String title,String header, String message) {
-        /**
-         * @param title
-         * @param header
-         * @param message
-         */
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -78,17 +68,13 @@ public class AlertHelper {
         alert.showAndWait();
     }
 
-    // Method to show a warning alert
-
     /**
+     * Displays a warning alert.
      *
-     *Metodo encargado de mostrar alertas de advertencia
+     * @param title   The title of the alert.
+     * @param message The message displayed in the alert body.
      */
     public static void showWarningAlert(String title, String message) {
-        /**
-         * @param title
-         * @param message
-         */
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(null);
