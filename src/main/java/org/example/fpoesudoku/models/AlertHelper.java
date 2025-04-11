@@ -6,11 +6,23 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.Region;
 import java.util.Optional;
 
+/**
+ * Esta clase se encarga de manejar todas las alertas
+ */
 public class AlertHelper {
 
     // Method to show a confirmation alert and returns true if the user clicks OK
     // Used for the "Empezar" button message confirmation
+
+    /**
+     *metodo encargado de mostrar alertas de confirmacion
+     */
     public static boolean showConfirmationAlert(String title, String message) {
+        /**
+         * @param title
+         * @param message
+         */
+
         // Custom buttons
         ButtonType yesButton = new ButtonType("Iniciar");
         ButtonType noButton = new ButtonType("Cancelar");
@@ -25,7 +37,16 @@ public class AlertHelper {
     }
 
     // Method to show an information alert
+
+    /**
+     *Metodo encargado de mostrar alertas de informacion
+     */
     public static void showInfoAlert(String title,String header, String message) {
+        /**
+         * @param title
+         * @param header
+         * @param message
+         */
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -39,7 +60,17 @@ public class AlertHelper {
     }
 
     // Method to show an error alert
+
+    /**
+     *
+     *Metodo encargado de mostrar alertas de error
+     */
     public static void showErrorAlert(String title,String header, String message) {
+        /**
+         * @param title
+         * @param header
+         * @param message
+         */
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(header);
@@ -48,7 +79,16 @@ public class AlertHelper {
     }
 
     // Method to show a warning alert
+
+    /**
+     *
+     *Metodo encargado de mostrar alertas de advertencia
+     */
     public static void showWarningAlert(String title, String message) {
+        /**
+         * @param title
+         * @param message
+         */
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -56,12 +96,4 @@ public class AlertHelper {
         alert.showAndWait();
     }
 
-    // Method to show a success alert
-    public static void showSuccessAlert(String title, String header, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
 }

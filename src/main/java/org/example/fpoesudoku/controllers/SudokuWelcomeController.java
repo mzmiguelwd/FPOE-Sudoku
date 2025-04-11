@@ -9,10 +9,17 @@ import javafx.stage.Stage;
 import org.example.fpoesudoku.models.AlertHelper;
 import java.io.IOException;
 
+/**
+ * clase controladora de el menu de bienvenida de el juego
+ */
 public class SudokuWelcomeController {
 
     // Method triggered when the "Empezar" button is clicked
     @FXML
+    /**
+     * evento on action de el boton "empezar"
+     * muestra la descripsion de el miniproyecto y carga la interfaz del juego
+     */
     void onActionStartButton(ActionEvent event) {
         String description = """
                 En este miniproyecto jugarás una versión del Sudoku en una cuadrícula de 6x6.

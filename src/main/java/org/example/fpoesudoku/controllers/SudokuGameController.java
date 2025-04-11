@@ -409,7 +409,7 @@ public class SudokuGameController {
         }
 
         // If all cells match, the puzzle is solved
-        alertHelper.showSuccessAlert("Congratulations!", "", "You've successfully completed the Sudoku!");
+        alertHelper.showInfoAlert("Congratulations!", "", "You've successfully completed the Sudoku!");
         System.out.println("Sudoku completed correctly.");
     }
 

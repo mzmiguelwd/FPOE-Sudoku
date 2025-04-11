@@ -8,6 +8,10 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.io.IOException;
 
+/**
+ * se encarga de la vista
+ * muestra el menu, define el icono para la aplicacion
+ */
 public class SudokuApplication extends Application {
 
     @Override
