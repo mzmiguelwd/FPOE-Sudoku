@@ -60,142 +60,198 @@ public class SudokuGameController {
         rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
 
         // Create a new GridPane for the board
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(1);
-        gridPane.setVgap(1);
-        gridPane.setAlignment(Pos.CENTER);
-        gridPane.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+        GridPane gridPane = createGridPane();
 
         // Loop through each cell of the matrix to create TextFields
         for (int row = 0; row < 6; row++) {
             for (int col = 0; col < 6; col++) {
-                TextField textField = new TextField();
-                textField.setPrefSize(40, 40);
-                textField.setAlignment(javafx.geometry.Pos.CENTER);
-                textField.setStyle("-fx-font-size: 18px;");
-
-                boolean isShadedBlock = (row / 2 + col / 3) % 2 == 0;
-                int value = board[row][col];
-
-                if (value != 0) {
-                    textField.setText(String.valueOf(value));
-                    textField.setEditable(false);
-                    textField.setPrefSize(40, 40);
-                    textField.setMinSize(40, 40);
-                    textField.setMaxSize(40, 40);
-                    textField.setStyle(
-                            (isShadedBlock ? "-fx-background-color: #d3d3d3;" : "-fx-background-color: lightgray;") +
-                                    " -fx-font-size: 18px;" +
-                                    " -fx-alignment: center;" +
-                                    " -fx-border-color: black;" +
-                                    " -fx-border-width: 1;" +
-                                    " -fx-background-insets: 0;" +
-                                    " -fx-padding: 0;"
-                    );
-                } else {
-                    textField.setEditable(true);
-                    textField.setPrefSize(40, 40);
-                    textField.setMinSize(40, 40);
-                    textField.setMaxSize(40, 40);
-
-                    String background = isShadedBlock ? "#f2f2f2" : "white";
-                    textField.setStyle(
-                            "-fx-background-color: " + background + ";" +
-                                    " -fx-font-size: 18px;" +
-                                    " -fx-alignment: center;" +
-                                    " -fx-border-color: black;" +
-                                    " -fx-border-width: 1;" +
-                                    " -fx-background-insets: 0;" +
-                                    " -fx-padding: 0;"
-                    );
-
-                    // Only allow numbers from 1 to 6
-                    UnaryOperator<TextFormatter.Change> filter = change -> {
-                        String newText = change.getControlNewText();
-                        if (newText.matches("[1-6]?")) {
-                            return change;
-                        }
-                        return null;
-                    };
-                    textField.setTextFormatter(new TextFormatter<>(filter));
-                }
-
-                int finalRow = row;
-                int finalCol = col;
-
-                textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                    if (newVal) {
-                        // Highlight the row, column, and quadrant
-                        for (Node node : gridPane.getChildren()) {
-                            if (node instanceof TextField tf) {
-                                Integer tfRow = GridPane.getRowIndex(tf);
-                                Integer tfCol = GridPane.getColumnIndex(tf);
-                                if (tfRow == null || tfCol == null) continue;
-
-                                boolean sameRow = tfRow == finalRow;
-                                boolean sameCol = tfCol == finalCol;
-                                boolean sameQuadrant = (tfRow / 2 == finalRow / 2) && (tfCol / 3 == finalCol / 3);
-
-                                if (sameRow || sameCol || sameQuadrant) {
-                                    tf.setStyle(tf.getStyle() + "; -fx-background-color: #ffcccc;");
-                                }
-                            }
-                        }
-                    } else {
-                        // Restore the style (you might want to store and restore the original style more robustly)
-                        for (Node node : gridPane.getChildren()) {
-                            if (node instanceof TextField tf) {
-                                int tfRow = GridPane.getRowIndex(tf);
-                                int tfCol = GridPane.getColumnIndex(tf);
-
-                                boolean isSelectBlock = (tfRow / 2 + tfCol / 3) % 2 == 0;
-                                boolean isEditable = tf.isEditable();
-                                String background = isEditable
-                                        ? (isSelectBlock ? "#f2f2f2" : "white")
-                                        : (isSelectBlock ? "#d3d3d3" : "lightgray");
-
-                                tf.setStyle(
-                                        "-fx-background-color: " + background + ";" +
-                                                " -fx-font-size: 18px;" +
-                                                " -fx-alignment: center;" +
-                                                " -fx-border-color: black;" +
-                                                " -fx-border-width: 1;" +
-                                                " -fx-background-insets: 0;" +
-                                                " -fx-padding: 0;"
-                                );
-                            }
-                        }
-                    }
-                });
-
-                gridPane.add(textField, col, row);
-
-                // Extra spacing between 2x3 blocks
-                int topMargin = (row % 2 == 0 && row != 0) ? 5 : 0;
-                int leftMargin = (col % 3 == 0 && col != 0) ? 5 : 0;
-                Insets margin = new Insets(topMargin, 0, 0, leftMargin);
-                GridPane.setMargin(textField, margin);
+                TextField cell = createCell(board[row][col], row, col);
+                addHighlightingBehavior(cell, row, col, gridPane);
+                gridPane.add(cell, col, row);
+                GridPane.setMargin(cell, getCellMargin(row, col));
             }
         }
 
-        // Add the board to the VBox
+        // Add the gridPane to the UI and keep reference for future use
         rootVBox.getChildren().add(0, gridPane);
-
-        // Update the reference so validation reads from this new board
         boardGrid = gridPane;
-      
-        // Click outside gridPane removes focus from TextFields
+
+        // Add global handler to remove focus when clicking outside the board
+        addFocusLossHandler(gridPane);
+    }
+
+    /**
+     * Creates and configures a GridPane layout for the Sudoku board.
+     *
+     * @return a styled and padded GridPane
+     */
+    private GridPane createGridPane() {
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(1);
+        gridPane.setVgap(1);
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setPadding(new Insets(10, 10, 10, 10));
+        return gridPane;
+    }
+
+    /**
+     * Creates a single TextField cell with appropriate value, styling, and input validation.
+     *
+     * @param value the numeric value of the cell (0 if editable)
+     * @param row   the row index of the cell
+     * @param col   the column index of the cell
+     * @return a configured TextField instance
+     */
+    private TextField createCell(int value, int row, int col) {
+        TextField textField = new TextField();
+        textField.setPrefSize(40, 40);
+        textField.setAlignment(Pos.CENTER);
+
+        boolean shaded = (row / 2 + col / 3) % 2 == 0;
+        boolean isEditable = value == 0;
+        String background = getBackgroundColor(shaded, isEditable);
+
+        textField.setText(value == 0 ? "" : String.valueOf(value));
+        textField.setEditable(isEditable);
+        textField.setStyle(getCellStyle(background));
+
+        if (isEditable) {
+            addInputFilter(textField);
+        }
+
+        return textField;
+    }
+
+    /**
+     * Adds a numeric input filter that allows only digits from 1 to 6.
+     *
+     * @param textField the TextField to restrict input on
+     */
+    private void addInputFilter(TextField textField) {
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+            String newText = change.getControlNewText();
+            return newText.matches("[1-6]?") ? change : null;
+        };
+        textField.setTextFormatter(new TextFormatter<>(filter));
+    }
+
+    /**
+     * Adds behaviour to highlight related cells (row, column, block) when the cell gains focus.
+     *
+     * @param cell the TextField to attach the behavior to
+     * @param row  the row index of the cell
+     * @param col  the column index of the cell
+     * @param grid the parent GridPane containing all cells
+     */
+    private void addHighlightingBehavior(TextField cell, int row, int col, GridPane grid) {
+        cell.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (isNowFocused) {
+                highlightGroup(grid, row, col);
+            } else {
+                resetBoardStyle(grid);
+            }
+        });
+    }
+
+    /**
+     * Highlights the entire row, column, and 2x3 block for the selected cell.
+     *
+     * @param grid the GridPane containing the board
+     * @param row  the focused row index
+     * @param col  the focused column index
+     */
+    private void highlightGroup(GridPane grid, int row, int col) {
+        for (Node node : grid.getChildren()) {
+            if (node instanceof TextField tf) {
+                Integer r = GridPane.getRowIndex(tf);
+                Integer c = GridPane.getColumnIndex(tf);
+                if (r == null || c == null) continue;
+
+                boolean sameRow = r == row;
+                boolean sameCol = c == col;
+                boolean sameBlock = (r / 2 == row / 2) && (c / 3 == col / 3);
+
+                if (sameRow || sameCol || sameBlock) {
+                    tf.setStyle(tf.getStyle() + "; -fx-background-color: #ffcccc;");
+                }
+            }
+        }
+    }
+
+    /**
+     * Resets all cell styles to their original color based on shaded/editable state.
+     *
+     * @param grid the GridPane whose children will be reset
+     */
+    private void resetBoardStyle(GridPane grid) {
+        for (Node node : grid.getChildren()) {
+            if (node instanceof TextField tf) {
+                int r = GridPane.getRowIndex(tf);
+                int c = GridPane.getColumnIndex(tf);
+                boolean shaded = (r / 2 + c / 3) % 2 == 0;
+                boolean editable = tf.isEditable();
+                String background = getBackgroundColor(shaded, editable);
+                tf.setStyle(getCellStyle(background));
+            }
+        }
+    }
+
+    /**
+     * Determines the background color for a cell based on its shaded and editable status.
+     *
+     * @param shaded whether the block should have a shaded background
+     * @param editable whether the cell is user-editable
+     * @return the appropriate background color as a hex string
+     */
+    private String getBackgroundColor(boolean shaded, boolean editable) {
+        if (editable) return shaded ? "#f2f2f2" : "white";
+        return shaded ? "#d3d3d3" : "lightgray";
+    }
+
+    /**
+     * Return a complete style string for a Sudoku cell.
+     *
+     * @param backgroundColor the background color to apply
+     * @return a concatenated CSS style string
+     */
+    private String getCellStyle(String backgroundColor) {
+        return String.format(
+                "-fx-background-color: %s; " +
+                "-fx-font-size: 18px; " +
+                "-fx-alignment: center; " +
+                "-fx-border-color: black; " +
+                "-fx-border-width: 1; " +
+                "-fx-background-insets: 0; " +
+                "-fx-padding: 0;", backgroundColor
+        );
+    }
+
+    /**
+     * Calculates cell margins to add extra spacing between Sudoku blocks.
+     *
+     * @param row the row index
+     * @param col the column index
+     * @return Insets with top and left padding for visual separation
+     */
+    private Insets getCellMargin(int row, int col) {
+        int top = (row % 2 == 0 && row != 0) ? 5 : 0;
+        int left = (col % 3 == 0 && col != 0) ? 5 : 0;
+        return new Insets(top, 0, 0, left);
+    }
+
+    /**
+     * Adds a global focus-loss handler that clears focus from the board when clicking outside.
+     *
+     * @param gridPane the Sudoku GridPane to monitor for external clicks
+     */
+    private void addFocusLossHandler(GridPane gridPane) {
         rootVBox.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             Node target = event.getPickResult().getIntersectedNode();
-
-            // Traverse up the node hierarchy to check if the click was inside the gridPane
             while (target != null && target != gridPane) {
                 target = target.getParent();
             }
-
-            // If the click was outside the gridPane
             if (target == null) {
-                rootVBox.requestFocus(); // Remove focus from any focused TextField
+                rootVBox.requestFocus(); // Clear focus from all fields
             }
         });
     }
@@ -248,6 +304,145 @@ public class SudokuGameController {
         System.out.println("Copy of the initial Sudoky phase created...");
 
         return partialSudoku;
+    }
+
+    /**
+     * Starts a new Sudoku game after user confirmation.
+     * It initializes a new Sudoku object, generates a solved board,
+     * creates a partially hidden version, and displays it on the screen.
+     *
+     * @param event button click event on the "Iniciar" button
+     */
+    @FXML
+    void onActionStartGameButton(ActionEvent event) {
+        // Ask the user to confirm if they want to start the game
+        boolean confirm = AlertHelper.showConfirmationAlert("Confirmación", "¿Seguro que quieres iniciar el juego?");
+
+        if (confirm) {
+            // Create a new Sudoku instance
+            sudoku = new Sudoku();
+
+            // Generate a valid, fully solved Sudoku board
+            sudoku.solveSudoku();
+
+            // Generate a partially hidden Sudoku based on the solved board
+            int[][] sudokuPartial = generatePartialSudoku(sudoku.getSudoku());
+
+            // Display the partially completed Sudoku board on the UI
+            addBoard(sudokuPartial);
+
+            System.out.println("Initialization started");
+        } else {
+            System.out.println("Initialization cancelled");
+        }
+    }
+
+    /**
+     * Resets the current game to its initial state,
+     * restoring the board to the version shown at the beginning.
+     *
+     * @param event button click event on the "Resetear" button.
+     */
+    @FXML
+    void onActionRestartButton(ActionEvent event) {
+        // Remove the current board if it exists
+        rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
+
+        if (sudoku == null || sudokuPartial == null) {
+            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
+            System.out.println("No existe ningun tablero...");
+            return;
+        }
+
+        // Create a new copy of the initial board to restart the game
+        int[][] newPartial = new int[6][6];
+        for (int i = 0; i < 6; i++) {
+            System.arraycopy(sudokuInitial[i], 0, newPartial[i], 0, 6);
+        }
+
+        sudokuPartial = newPartial;
+
+        // Add the restarted board back to the interface
+        addBoard(sudokuPartial);
+    }
+
+    /**
+     * Validates the current state of the Sudoku board entered by the user.
+     * If the board matches the solved version, a success alert is shown.
+     * Otherwise, an error alert indicates the puzzle is not yet solved.
+     *
+     * @param event button click event on the "Validate" button
+     */
+    @FXML
+    void onActionValidateButton(ActionEvent event) {
+        // Check if a game has started
+        if (sudoku == null || sudokuPartial == null) {
+            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
+            System.out.println("No existe ningun tablero...");
+            return;
+        }
+
+        // Loop through the nodes in the GridPane to capture user input
+        for (Node node : boardGrid.getChildren()) {
+            if (node instanceof TextField) {
+                Integer row = GridPane.getRowIndex(node);
+                Integer col = GridPane.getColumnIndex(node);
+
+                // Fallback in case row/col is null
+                if (row == null) row = 0;
+                if (col == null) col = 0;
+
+                String text = ((TextField) node).getText().trim();
+
+                if (!text.isEmpty()) {
+                    try {
+                        int value = Integer.parseInt(text);
+                        sudokuPartial[row][col] = value;
+                    } catch (NumberFormatException e) {
+                        sudokuPartial[row][col] = 0; // Invalid input set to 0
+                    }
+                } else {
+                    sudokuPartial[row][col] = 0; // Empty cell
+                }
+            }
+        }
+
+        int [][] solution = sudoku.getSudoku();
+
+        // Check every cell to see if the user's input matches the solution
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (sudokuPartial[i][j] != solution[i][j]) {
+                    alertHelper.showErrorAlert("Un momento...", "", "Oops! El Sudoku no ha sido resuelto correctamente aún.");
+                    System.out.println("Solución incorrecta en: [" + i + ", " + j + "]");
+                    return;
+                }
+            }
+        }
+
+        // If all cells match, the puzzle is solved
+        alertHelper.showInfoAlert("Congratulations!", "", "You've successfully completed the Sudoku!");
+        System.out.println("Sudoku completed correctly.");
+    }
+
+    /**
+     * Displays an informational alert with the game instructions.
+     *
+     * @param event mouse click event on the question mark icon.
+     */
+    @FXML
+    void onActionMouseClickedQuestionMark(MouseEvent event) {
+        String title = "Instrucciones del juego";
+        String header = "Cómo jugar Sudoku 6x6";
+        String content =
+                "1. El tablero está compuesto por 6 filas y 6 columnas, formando un total de 36 casillas.\n\n" +
+                        "2. Se divide en 6 regiones del mismo tamaño: 2x3 (2 filas x 3 columnas).\n\n" +
+                        "3. Debes llenar todas las casillas con números del 1 al 6, siguiendo estas reglas:\n\n" +
+                        "4. Cada fila debe contener los números del 1 al 6, sin repetir.\n\n" +
+                        "5. Cada columna debe contener los números del 1 al 6, sin repetir.\n\n" +
+                        "6. Cada región debe contener los números del 1 al 6, sin repetir.\n\n" +
+                        "7. Cada tablero tiene una única solución correcta.";
+        alertHelper.showInfoAlert(title, header, content);
     }
 
     /**
@@ -320,145 +515,6 @@ public class SudokuGameController {
             System.out.println("Ya no te quedan ayudas...");
         }
 
-    }
-
-    /**
-     * Displays an informational alert with the game instructions.
-     *
-     * @param event mouse click event on the question mark icon.
-     */
-    @FXML
-    void onActionMouseClickedQuestionMark(MouseEvent event) {
-        String title = "Instrucciones del juego";
-        String header = "Cómo jugar Sudoku 6x6";
-        String content =
-                "1. El tablero está compuesto por 6 filas y 6 columnas, formando un total de 36 casillas.\n\n" +
-                "2. Se divide en 6 regiones del mismo tamaño: 2x3 (2 filas x 3 columnas).\n\n" +
-                "3. Debes llenar todas las casillas con números del 1 al 6, siguiendo estas reglas:\n\n" +
-                "4. Cada fila debe contener los números del 1 al 6, sin repetir.\n\n" +
-                "5. Cada columna debe contener los números del 1 al 6, sin repetir.\n\n" +
-                "6. Cada región debe contener los números del 1 al 6, sin repetir.\n\n" +
-                "7. Cada tablero tiene una única solución correcta.";
-        alertHelper.showInfoAlert(title, header, content);
-    }
-
-    /**
-     * Resets the current game to its initial state,
-     * restoring the board to the version shown at the beginning.
-     *
-     * @param event button click event on the "Resetear" button.
-     */
-    @FXML
-    void onActionRestartButton(ActionEvent event) {
-        // Remove the current board if it exists
-        rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
-
-        if (sudoku == null || sudokuPartial == null) {
-            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
-            System.out.println("No existe ningun tablero...");
-            return;
-        }
-
-        // Create a new copy of the initial board to restart the game
-        int[][] newPartial = new int[6][6];
-        for (int i = 0; i < 6; i++) {
-            System.arraycopy(sudokuInitial[i], 0, newPartial[i], 0, 6);
-        }
-
-        sudokuPartial = newPartial;
-
-        // Add the restarted board back to the interface
-        addBoard(sudokuPartial);
-    }
-
-    /**
-     * Starts a new Sudoku game after user confirmation.
-     * It initializes a new Sudoku object, generates a solved board,
-     * creates a partially hidden version, and displays it on the screen.
-     *
-     * @param event button click event on the "Iniciar" button
-     */
-    @FXML
-    void onActionStartGameButton(ActionEvent event) {
-        // Ask the user to confirm if they want to start the game
-        boolean confirm = AlertHelper.showConfirmationAlert("Confirmación", "¿Seguro que quieres iniciar el juego?");
-
-        if (confirm) {
-            // Create a new Sudoku instance
-            sudoku = new Sudoku();
-
-            // Generate a valid, fully solved Sudoku board
-            sudoku.solveSudoku();
-
-            // Generate a partially hidden Sudoku based on the solved board
-            int[][] sudokuPartial = generatePartialSudoku(sudoku.getSudoku());
-
-            // Display the partially completed Sudoku board on the UI
-            addBoard(sudokuPartial);
-
-            System.out.println("Initialization started");
-        } else {
-            System.out.println("Initialization cancelled");
-        }
-    }
-
-    /**
-     * Validates the current state of the Sudoku board entered by the user.
-     * If the board matches the solved version, a success alert is shown.
-     * Otherwise, an error alert indicates the puzzle is not yet solved.
-     *
-     * @param event button click event on the "Validate" button
-     */
-    @FXML
-    void onActionValidateButton(ActionEvent event) {
-        // Check if a game has started
-        if (sudoku == null || sudokuPartial == null) {
-            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
-            System.out.println("No existe ningun tablero...");
-            return;
-        }
-
-        // Loop through the nodes in the GridPane to capture user input
-        for (Node node : boardGrid.getChildren()) {
-            if (node instanceof TextField) {
-                Integer row = GridPane.getRowIndex(node);
-                Integer col = GridPane.getColumnIndex(node);
-
-                // Fallback in case row/col is null
-                if (row == null) row = 0;
-                if (col == null) col = 0;
-
-                String text = ((TextField) node).getText().trim();
-
-                if (!text.isEmpty()) {
-                    try {
-                        int value = Integer.parseInt(text);
-                        sudokuPartial[row][col] = value;
-                    } catch (NumberFormatException e) {
-                        sudokuPartial[row][col] = 0; // Invalid input set to 0
-                    }
-                } else {
-                    sudokuPartial[row][col] = 0; // Empty cell
-                }
-            }
-        }
-
-        int [][] solution = sudoku.getSudoku();
-
-        // Check every cell to see if the user's input matches the solution
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (sudokuPartial[i][j] != solution[i][j]) {
-                    alertHelper.showErrorAlert("Un momento...", "", "Oops! El Sudoku no ha sido resuelto correctamente aún.");
-                    System.out.println("Solución incorrecta en: [" + i + ", " + j + "]");
-                    return;
-                }
-            }
-        }
-
-        // If all cells match, the puzzle is solved
-        alertHelper.showInfoAlert("Congratulations!", "", "You've successfully completed the Sudoku!");
-        System.out.println("Sudoku completed correctly.");
     }
 
 }

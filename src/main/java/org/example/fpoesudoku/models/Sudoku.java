@@ -1,5 +1,9 @@
 package org.example.fpoesudoku.models;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Represents a 6x6 Sudoku puzzle and provides methods to solve and validate it.
  */
@@ -31,7 +35,10 @@ public class Sudoku {
         for (int row = 0; row < 6; row++) { // Iterate through each row
             for (int col = 0; col < 6; col++) { // Iterate through each column
                 if (sudoku[row][col] == 0) { // Check for an empty cell (value 0)
-                    for (int value = 1; value <= 6; value++) { // Try numbers from 1 to 6
+                    List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6);
+                    Collections.shuffle(numbers);
+
+                    for (int value : numbers) { // Try random numbers from 1 to 6
                         if (validMovement(row, col, value)) { // Check if the number is valid in this position
                             sudoku[row][col] = value; // Assign a tentative number
 
