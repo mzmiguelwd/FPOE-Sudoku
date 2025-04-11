@@ -2,7 +2,9 @@ package org.example.fpoesudoku.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.MouseEvent;
@@ -10,6 +12,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.example.fpoesudoku.models.AlertHelper;
 import org.example.fpoesudoku.models.Sudoku;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.function.UnaryOperator;
 
@@ -27,8 +33,8 @@ public class SudokuGameController {
 
         // Create a new GridPane for the board
         GridPane gridPane = new GridPane();
-        gridPane.setHgap(5);
-        gridPane.setVgap(5);
+        gridPane.setHgap(1);
+        gridPane.setVgap(1);
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
 
@@ -86,12 +92,81 @@ public class SudokuGameController {
                     textField.setTextFormatter(new TextFormatter<>(filter));
                 }
 
+                int finalRow = row;
+                int finalCol = col;
+
+                textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal) {
+                        // Highlight the row, column, and quadrant
+                        for (Node node : gridPane.getChildren()) {
+                            if (node instanceof TextField tf) {
+                                Integer tfRow = GridPane.getRowIndex(tf);
+                                Integer tfCol = GridPane.getColumnIndex(tf);
+                                if (tfRow == null || tfCol == null) continue;
+
+                                boolean sameRow = tfRow == finalRow;
+                                boolean sameCol = tfCol == finalCol;
+                                boolean sameQuadrant = (tfRow / 2 == finalRow / 2) && (tfCol / 3 == finalCol / 3);
+
+                                if (sameRow || sameCol || sameQuadrant) {
+                                    tf.setStyle(tf.getStyle() + "; -fx-background-color: #ffcccc;");
+                                }
+                            }
+                        }
+                    } else {
+                        // Restore the style (you might want to store and restore the original style more robustly)
+                        for (Node node : gridPane.getChildren()) {
+                            if (node instanceof TextField tf) {
+                                int tfRow = GridPane.getRowIndex(tf);
+                                int tfCol = GridPane.getColumnIndex(tf);
+
+                                boolean isSelectBlock = (tfRow / 2 + tfCol / 3) % 2 == 0;
+                                boolean isEditable = tf.isEditable();
+                                String background = isEditable
+                                        ? (isSelectBlock ? "#f2f2f2" : "white")
+                                        : (isSelectBlock ? "#d3d3d3" : "lightgray");
+
+                                tf.setStyle(
+                                        "-fx-background-color: " + background + ";" +
+                                                " -fx-font-size: 18px;" +
+                                                " -fx-alignment: center;" +
+                                                " -fx-border-color: black;" +
+                                                " -fx-border-width: 1;" +
+                                                " -fx-background-insets: 0;" +
+                                                " -fx-padding: 0;"
+                                );
+                            }
+                        }
+                    }
+                });
+
                 gridPane.add(textField, col, row);
+
+                // Extra spacing between 2x3 blocks
+                int topMargin = (row % 2 == 0 && row != 0) ? 5 : 0;
+                int leftMargin = (col % 3 == 0 && col != 0) ? 5 : 0;
+                Insets margin = new Insets(topMargin, 0, 0, leftMargin);
+                GridPane.setMargin(textField, margin);
             }
         }
 
         // Add the board to the VBox
         rootVBox.getChildren().add(0, gridPane);
+
+        // Click outside gridPane removes focus from TextFields
+        rootVBox.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            Node target = event.getPickResult().getIntersectedNode();
+
+            // Traverse up the node hierarchy to check if the click was inside the gridPane
+            while (target != null && target != gridPane) {
+                target = target.getParent();
+            }
+
+            // If the click was outside the gridPane
+            if (target == null) {
+                rootVBox.requestFocus(); // Remove focus from any focused TextField
+            }
+        });
     }
 
     private int[][] generatePartialSudoku(int[][] completeSudoku) {
@@ -103,16 +178,24 @@ public class SudokuGameController {
         }
 
         Random random = new Random();
-        int cellsToRemove = 12; // Number of cells to empty
 
-        // Randomly remove numbers from the board until the desired amount is reached
-        while (cellsToRemove > 0) {
-            int row = random.nextInt(6);
-            int col = random.nextInt(6);
+        // Remove exactly 4 cells per 2x3 quadrant
+        for (int startRow = 0; startRow < 6; startRow += 2) {
+            for (int startCol = 0; startCol < 6; startCol += 3) {
+                // Collect all cell positions in the current 2x3 quadrant
+                List<int[]> positions = new ArrayList<>();
+                for (int row = startRow; row < startRow + 2; row++) {
+                    for (int col = startCol; col < startCol + 3; col++) {
+                        positions.add(new int[]{row, col});
+                    }
+                }
 
-            if (partialSudoku[row][col] != 0) {
-                partialSudoku[row][col] = 0; // Empty the cell
-                cellsToRemove--;
+                // Shuffle and remove 4 random cells
+                Collections.shuffle(positions, random);
+                for (int i = 0; i < 4; i++) {
+                    int[] pos = positions.get(i);
+                    partialSudoku[pos[0]][pos[1]] = 0;
+                }
             }
         }
 
