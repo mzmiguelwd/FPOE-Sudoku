@@ -7,7 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.example.fpoesudoku.models.AlertHelper;
-
 import java.io.IOException;
 
 public class SudokuWelcomeController {
@@ -21,7 +20,7 @@ public class SudokuWelcomeController {
                 cada fila, columna y bloque de 2x3 contenga todos los números sin repetir.
                 
                 El juego incluye entrada de números con el mouse y el teclado, un sistema de
-                ayudas ilimitadas, y validación automática de los números ingresados para
+                ayudas limitadas, y validación automática de los números ingresados para
                 cumplir con las reglas.
                 """;
 

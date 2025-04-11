@@ -33,7 +33,7 @@
                   <DropShadow />
                </effect>
             </ImageView>
-            <Button mnemonicParsing="false" onAction="#onActionSubmitButton" prefHeight="22.0" prefWidth="74.0" text="Validar" translateX="170.0" />
+            <Button mnemonicParsing="false" onAction="#onActionValidateButton" prefHeight="22.0" prefWidth="74.0" text="Validar" translateX="170.0" />
             <Button mnemonicParsing="false" onAction="#onActionRestartButton" prefHeight="26.0" prefWidth="75.0" text="Resetear" translateX="210.0" />
         </items>
       </ToolBar>

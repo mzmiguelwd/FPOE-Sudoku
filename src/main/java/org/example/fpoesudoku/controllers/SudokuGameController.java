@@ -16,30 +16,32 @@ import java.util.*;
 import java.util.function.UnaryOperator;
 
 public class SudokuGameController {
+
     @FXML
-    AlertHelper alertHelper=new AlertHelper();
+    AlertHelper alertHelper = new AlertHelper();
+
     @FXML
     private VBox rootVBox; // VBox reference
 
     private static final int SIZE = 6;
     private Sudoku sudoku;
-
+    private GridPane boardGrid;
 
     @FXML
-    int[][] sudokuParcial; //Copy of the sudoku gridPane (used in the start button logic)
-    int[][] sudokuInicial; //Copy of the first stage of the sudoku (used for the restart button logic)
+    int[][] sudokuPartial; //Copy of the sudoku gridPane (used in the start button logic)
+    int[][] sudokuInitial; //Copy of the first stage of the sudoku (used for the restart button logic)
 
-
-    public void imprimirSudoku(int[][] tablero) {
-        for (int i = 0; i < tablero.length; i++) {
-            for (int j = 0; j < tablero[i].length; j++) {
-                System.out.print(tablero[i][j] + " ");
+    // Function to print the Sudoku board
+    public void printSudoku(int[][] board) {
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                System.out.print(board[i][j] + " ");
             }
-            System.out.println(); //functions to print the sudokus
+            System.out.println();
         }
     }
 
-    private void addBoard(int[][] tablero) {
+    private void addBoard(int[][] board) {
         // Remove any existing GridPane to avoid duplicates
         rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
 
@@ -59,7 +61,7 @@ public class SudokuGameController {
                 textField.setStyle("-fx-font-size: 18px;");
 
                 boolean isShadedBlock = (row / 2 + col / 3) % 2 == 0;
-                int value = tablero[row][col];
+                int value = board[row][col];
 
                 if (value != 0) {
                     textField.setText(String.valueOf(value));
@@ -164,6 +166,9 @@ public class SudokuGameController {
 
         // Add the board to the VBox
         rootVBox.getChildren().add(0, gridPane);
+
+        // Update the reference so validation reads from this new board
+        boardGrid = gridPane;
       
         // Click outside gridPane removes focus from TextFields
         rootVBox.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -210,28 +215,32 @@ public class SudokuGameController {
                 }
             }
         }
-        sudokuParcial=partialSudoku;
-        imprimirSudoku(sudokuParcial);
-        //copy of the primary stage of the sudoku that is not affected by any functions
-        sudokuInicial = new int[6][6];
+
+        sudokuPartial = partialSudoku;
+        printSudoku(sudokuPartial);
+
+        // Copy of the initial state of the Sudoku board that won't be modified by other functions
+        sudokuInitial = new int[6][6];
         for (int i = 0; i < 6; i++) {
-            System.arraycopy(partialSudoku[i], 0, sudokuInicial[i], 0, 6);
+            System.arraycopy(partialSudoku[i], 0, sudokuInitial[i], 0, 6);
         }
-        System.out.println("copia de la fase inicial del sudoku echa...");
+        System.out.println("Copy of the initial Sudoky phase created...");
 
         return partialSudoku;
     }
 
+    // Function that handles the light bulb: provides a hint by revealing a valid cell in the Sudoku
     @FXML
     void onActionMouseClickedLightBulb(MouseEvent event) {
-        int nEmptyCells=2;//number of the cells that will always be empty
-        if (sudoku == null || sudokuParcial == null) {
+        int minRemainingCells = 2; // Minimum number of empty cells before hints are disabled
+
+        if (sudoku == null || sudokuPartial == null) {
             alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
-            System.out.println("No existe ningun tablero...");
+            System.out.println("Aún no existe ningún tablero...");
             return;
         }
 
-        // Gets the grid pane
+        // Retrieve the grid pane from the root VBox
         GridPane gridPane = null;
         for (javafx.scene.Node node : rootVBox.getChildren()) {
             if (node instanceof GridPane) {
@@ -245,93 +254,87 @@ public class SudokuGameController {
             return;
         }
 
-        // Search for the empty cells
+        // Collect all currently empty cells
         List<int[]> emptyCells = new ArrayList<>();
-
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                if (sudokuParcial[i][j] == 0) {
+                if (sudokuPartial[i][j] == 0) {
                     emptyCells.add(new int[]{i, j});
-
                 }
             }
         }
 
-
-        if(emptyCells.size()>nEmptyCells) {
-            // Selects a random empty cell
+        if (emptyCells.size() > minRemainingCells) {
+            // Select a random empty cell
             Random rand = new Random();
             int[] cell = emptyCells.get(rand.nextInt(emptyCells.size()));
             int row = cell[0];
             int col = cell[1];
 
-            // Takes the right value and updates the sudoku
+            // Retrieve the correct value from the original Sudoku board
             int correctValue = sudoku.getSudoku()[row][col];
-            sudokuParcial[row][col] = correctValue;
+            sudokuPartial[row][col] = correctValue;
 
-            // Updates the textfield
+            // Update the corresponding TextField in the UI
             for (javafx.scene.Node node : gridPane.getChildren()) {
-                if (GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == col && node instanceof TextField) {
+                if (GridPane.getRowIndex(node) == row &&
+                        GridPane.getColumnIndex(node) == col &&
+                        node instanceof TextField) {
                     TextField tf = (TextField) node;
                     tf.setText(String.valueOf(correctValue));
                     tf.setEditable(false);
-                    tf.setStyle(tf.getStyle() + "; -fx-text-fill: green;"); // Shows the help in green
+                    tf.setStyle(tf.getStyle() + "; -fx-text-fill: green;"); // Highlight hint in green
                     break;
                 }
             }
 
             System.out.println("Ayuda aplicada en [" + row + "," + col + "] = " + correctValue);
-        }
-        if (emptyCells.size() <= nEmptyCells) {
-            alertHelper.showWarningAlert("advertencia","ya no te quedan ayudas");
+        } else {
+            alertHelper.showWarningAlert("Advertencia","Ya no te quedan ayudas.");
             System.out.println("Ya no te quedan ayudas...");
-
-
         }
 
+    }
 
-    } // Function to handles the light bulb: help to complete part of the sudoku
-        /*the function creates a copy from the current board then adds a valid value
-        and uses the index to update the original grid pane with the valid value
-        */
+    // Function that handles the question mark button: displays game instructions
     @FXML
     void onActionMouseClickedQuestionMark(MouseEvent event) {
-    alertHelper.showInfoAlert("Instrucciones del juego","instrucciones del sudoku 6x6","1. El tablero está compuesto por 6 filas y 6 columnas, formando un total de 36 casillas.\n" +
-            "\n" +
-            "2. El tablero se divide en 6 regiones de igual tamaño, de 3x2 (3 columnas por 2 filas) o 2x3, según el diseño.\n" +
-            "\n" +
-            "3. Debes llenar todas las casillas con números del 1 al 6, siguiendo estas reglas:\n" +
-            "\n" +
-            "4. Cada fila debe contener los números del 1 al 6 sin repetir.\n" +
-            "\n" +
-            "5. Cada columna debe contener los números del 1 al 6 sin repetir.\n" +
-            "\n" +
-            "6. Cada región debe contener los números del 1 al 6 sin repetir.\n" +
-            "\n" +
-            "7. No hay soluciones múltiples: cada tablero tiene una única solución correcta");
-    } // Function to handles the question mark
+        String title = "Instrucciones del juego";
+        String header = "Cómo jugar Sudoku 6x6";
+        String content =
+                "1. El tablero está compuesto por 6 filas y 6 columnas, formando un total de 36 casillas.\n\n" +
+                "2. Se divide en 6 regiones del mismo tamaño: 2x3 (2 filas x 3 columnas).\n\n" +
+                "3. Debes llenar todas las casillas con números del 1 al 6, siguiendo estas reglas:\n\n" +
+                "4. Cada fila debe contener los números del 1 al 6, sin repetir.\n\n" +
+                "5. Cada columna debe contener los números del 1 al 6, sin repetir.\n\n" +
+                "6. Cada región debe contener los números del 1 al 6, sin repetir.\n\n" +
+                "7. Cada tablero tiene una única solución correcta.";
+        alertHelper.showInfoAlert(title, header, content);
+    }
 
+    // Function that handles the Restart button click: resets the Sudoku board to its initial state
     @FXML
     void onActionRestartButton(ActionEvent event) {
+        // Remove the current board if it exists
         rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
 
-        if (sudoku == null || sudokuParcial == null) {
+        if (sudoku == null || sudokuPartial == null) {
             alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
             System.out.println("No existe ningun tablero...");
             return;
-
         }
-        //Copy of the initial sudoku to avoid modifying it so the sudoku restarts correctly
-        int[][] nuevoParcial = new int[6][6];
+
+        // Create a new copy of the initial board to restart the game
+        int[][] newPartial = new int[6][6];
         for (int i = 0; i < 6; i++) {
-            System.arraycopy(sudokuInicial[i], 0, nuevoParcial[i], 0, 6);
+            System.arraycopy(sudokuInitial[i], 0, newPartial[i], 0, 6);
         }
-        sudokuParcial = nuevoParcial;
-        rootVBox.getChildren().removeIf(node -> node instanceof GridPane);
-        addBoard(sudokuParcial);
 
+        sudokuPartial = newPartial;
 
-    } // Function to handles the Restart button click
+        // Add the restarted board back to the interface
+        addBoard(sudokuPartial);
+    }
 
     @FXML
     void onActionStartGameButton(ActionEvent event) {
@@ -346,10 +349,10 @@ public class SudokuGameController {
             sudoku.solveSudoku();
 
             // Generate a partially hidden Sudoku based on the solved board
-            int[][] sudokuParcial = generatePartialSudoku(sudoku.getSudoku());
+            int[][] sudokuPartial = generatePartialSudoku(sudoku.getSudoku());
 
             // Display the partially completed Sudoku board on the UI
-            addBoard(sudokuParcial);
+            addBoard(sudokuPartial);
 
             System.out.println("Initialization started");
         } else {
@@ -357,9 +360,57 @@ public class SudokuGameController {
         }
     }
 
+    // Function that handles the "Validar" button: checks if the user has completed the Sudoku correctly
     @FXML
-    void onActionSubmitButton(ActionEvent event) {
+    void onActionValidateButton(ActionEvent event) {
+        // Check if a game has started
+        if (sudoku == null || sudokuPartial == null) {
+            alertHelper.showErrorAlert("Error","", "Debes iniciar un juego primero.");
+            System.out.println("No existe ningun tablero...");
+            return;
+        }
 
+        // Loop through the nodes in the GridPane to capture user input
+        for (Node node : boardGrid.getChildren()) {
+            if (node instanceof TextField) {
+                Integer row = GridPane.getRowIndex(node);
+                Integer col = GridPane.getColumnIndex(node);
+
+                // Fallback in case row/col is null
+                if (row == null) row = 0;
+                if (col == null) col = 0;
+
+                String text = ((TextField) node).getText().trim();
+
+                if (!text.isEmpty()) {
+                    try {
+                        int value = Integer.parseInt(text);
+                        sudokuPartial[row][col] = value;
+                    } catch (NumberFormatException e) {
+                        sudokuPartial[row][col] = 0; // Invalid input set to 0
+                    }
+                } else {
+                    sudokuPartial[row][col] = 0; // Empty cell
+                }
+            }
+        }
+
+        int [][] solution = sudoku.getSudoku();
+
+        // Check every cell to see if the user's input matches the solution
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (sudokuPartial[i][j] != solution[i][j]) {
+                    alertHelper.showErrorAlert("Un momento...", "", "Oops! El Sudoku no ha sido resuelto correctamente aún.");
+                    System.out.println("Solución incorrecta en: [" + i + ", " + j + "]");
+                    return;
+                }
+            }
+        }
+
+        // If all cells match, the puzzle is solved
+        alertHelper.showSuccessAlert("Congratulations!", "", "You've successfully completed the Sudoku!");
+        System.out.println("Sudoku completed correctly.");
     }
 
 }
