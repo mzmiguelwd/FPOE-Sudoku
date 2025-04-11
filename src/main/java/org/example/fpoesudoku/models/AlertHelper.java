@@ -25,10 +25,10 @@ public class AlertHelper {
     }
 
     // Method to show an information alert
-    public static void showInfoAlert(String title, String message) {
+    public static void showInfoAlert(String title,String header, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
-        alert.setHeaderText(null);
+        alert.setHeaderText(header);
         alert.setContentText(message);
 
         DialogPane dialogPane = alert.getDialogPane();
@@ -39,10 +39,10 @@ public class AlertHelper {
     }
 
     // Method to show an error alert
-    public static void showErrorAlert(String title, String message) {
+    public static void showErrorAlert(String title,String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
-        alert.setHeaderText(null);
+        alert.setHeaderText(header);
         alert.setContentText(message);
         alert.showAndWait();
     }
