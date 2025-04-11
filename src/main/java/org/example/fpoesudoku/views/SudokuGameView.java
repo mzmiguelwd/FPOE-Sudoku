@@ -2,6 +2,7 @@ package org.example.fpoesudoku.views;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.example.fpoesudoku.SudokuApplication;
 import org.example.fpoesudoku.controllers.SudokuGameController;

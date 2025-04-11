@@ -55,4 +55,13 @@ public class AlertHelper {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    // Method to show a success alert
+    public static void showSuccessAlert(String title, String header, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
