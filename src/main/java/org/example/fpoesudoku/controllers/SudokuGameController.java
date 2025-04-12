@@ -334,6 +334,8 @@ public class SudokuGameController {
             // Display the partially completed Sudoku board on the UI
             addBoard(sudokuPartial);
 
+            showRequirements();
+
             System.out.println("Initialization started");
         } else {
             System.out.println("Initialization cancelled");
@@ -517,6 +519,69 @@ public class SudokuGameController {
             alertHelper.showWarningAlert("Advertencia","Ya no te quedan ayudas.");
             System.out.println("Ya no te quedan ayudas...");
         }
+
+    }
+
+    /**
+     * This function implements the requirements for the sustentation.
+     * Showing 2 complete columns and all 1 of the correct board.
+     */
+    private void showRequirements() {
+        // Retrieve the grid pane from the root VBox
+        GridPane gridPane = null;
+        for (javafx.scene.Node node : rootVBox.getChildren()) {
+            if (node instanceof GridPane) {
+                gridPane = (GridPane) node;
+                break;
+            }
+        }
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 6; j++) {
+                // Retrieve the correct value from the original Sudoku board
+                int correctValue = sudoku.getSudoku()[j][i];
+                sudokuInitial[j][i] = correctValue;
+                sudokuPartial[j][i] = correctValue;
+
+                // Update the corresponding TextField in the UI
+                for (javafx.scene.Node node : gridPane.getChildren()) {
+                    if (GridPane.getRowIndex(node) == j &&
+                            GridPane.getColumnIndex(node) == i &&
+                            node instanceof TextField) {
+                        TextField tf = (TextField) node;
+                        tf.setText(String.valueOf(correctValue));
+                        tf.setEditable(false);
+                        tf.setStyle(tf.getStyle() + "; -fx-background-color: lightgray;");
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                // Retrieve ones from the original Sudoku board
+                int isOne = sudoku.getSudoku()[i][j];
+                if (isOne == 1) {
+                    sudokuInitial[i][j] = isOne;
+                    sudokuPartial[i][j] = isOne;
+
+                    // Update the corresponding TextField in the UI
+                    for (javafx.scene.Node node : gridPane.getChildren()) {
+                        if (GridPane.getRowIndex(node) == i &&
+                                GridPane.getColumnIndex(node) == j &&
+                                node instanceof TextField) {
+                            TextField tf = (TextField) node;
+                            tf.setText(String.valueOf(isOne));
+                            tf.setEditable(false);
+                            tf.setStyle(tf.getStyle() + "; -fx-background-color: lightgray;");
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 
