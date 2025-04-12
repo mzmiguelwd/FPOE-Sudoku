@@ -37,6 +37,7 @@ public class SudokuGameController {
     @FXML
     int[][] sudokuPartial; // Copy of the current Sudoku board with some cells removed
     int[][] sudokuInitial; // Copy of the initial state of the Sudoku board (for resets)
+    int[][] sudokuReto;
 
     /**
      * Prints the Sudoku board to the console (for debugging purposes).
@@ -296,6 +297,26 @@ public class SudokuGameController {
             }
         }
 
+        for (int startRow = 0; startRow < 6; startRow += 1) {
+            for (int startCol = 1; startCol < 5; startCol += 3) {
+                int valor_correcto=sudoku.getSudoku()[startRow][startCol];
+               // sudokuInitial[startRow][startCol]=valor_correcto;
+                partialSudoku[startRow][startCol]=valor_correcto;
+
+            }
+
+        }
+        for (int startRow = 0; startRow < 6; startRow += 1) {
+            for (int startCol = 0; startCol < 6; startCol += 1) {
+                int valor_correcto=sudoku.getSudoku()[startRow][startCol];
+                // sudokuInitial[startRow][startCol]=valor_correcto;
+                if (valor_correcto==1) {
+                    partialSudoku[startRow][startCol] = valor_correcto;
+
+                }
+            }
+
+        }
         sudokuPartial = partialSudoku;
         printSudoku(sudokuPartial);
 
@@ -325,10 +346,14 @@ public class SudokuGameController {
             // Create a new Sudoku instance
             sudoku = new Sudoku();
 
+
             // Generate a valid, fully solved Sudoku board
             sudoku.solveSudoku();
+            //sudoku reto
+
 
             // Generate a partially hidden Sudoku based on the solved board
+
             int[][] sudokuPartial = generatePartialSudoku(sudoku.getSudoku());
 
             // Display the partially completed Sudoku board on the UI
