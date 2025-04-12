@@ -11,6 +11,8 @@ import java.io.IOException;
  * Represents the welcome window of the Sudoku game.
  * This class extends {@link Stage} and loads the welcome screen from the corresponding FXML file.
  * It uses the singleton pattern to ensure only one instance of the welcome view is created.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class SudokuWelcomeView extends Stage {
 

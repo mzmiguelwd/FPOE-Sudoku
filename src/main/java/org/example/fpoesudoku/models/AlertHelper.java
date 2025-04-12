@@ -9,6 +9,8 @@ import java.util.Optional;
 /**
  * Utility class responsible for displaying different types of alerts
  * (confirmation, information, error, and warning) in the user interface.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class AlertHelper {
 

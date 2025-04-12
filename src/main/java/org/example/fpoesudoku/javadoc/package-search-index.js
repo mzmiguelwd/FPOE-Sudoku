@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"org.example.fpoesudoku","l":"org.example.fpoesudoku"},{"m":"org.example.fpoesudoku","l":"org.example.fpoesudoku.controllers"},{"m":"org.example.fpoesudoku","l":"org.example.fpoesudoku.models"},{"m":"org.example.fpoesudoku","l":"org.example.fpoesudoku.views"}];updateSearchResults();

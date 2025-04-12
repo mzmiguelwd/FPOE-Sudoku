@@ -10,6 +10,8 @@ import java.io.IOException;
 /**
  * This class represents the main game view of the Sudoku application.
  * It loads the UI from an FXML file and initializes the game controller.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class SudokuGameView extends Stage {
 

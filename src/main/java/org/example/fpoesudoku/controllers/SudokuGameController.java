@@ -15,9 +15,12 @@ import org.example.fpoesudoku.models.Sudoku;
 import java.util.*;
 import java.util.function.UnaryOperator;
 
+
 /**
  * Main controller for the 6x6 Sudoku game.
  * Manages the interaction logic between the view and the game model.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class SudokuGameController {
 

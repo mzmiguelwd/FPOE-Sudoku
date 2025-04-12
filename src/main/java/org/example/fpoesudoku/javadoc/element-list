@@ -1,0 +1,5 @@
+module:org.example.fpoesudoku
+org.example.fpoesudoku
+org.example.fpoesudoku.controllers
+org.example.fpoesudoku.models
+org.example.fpoesudoku.views

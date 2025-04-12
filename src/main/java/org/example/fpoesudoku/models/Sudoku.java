@@ -6,6 +6,8 @@ import java.util.List;
 
 /**
  * Represents a 6x6 Sudoku puzzle and provides methods to solve and validate it.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class Sudoku {
 

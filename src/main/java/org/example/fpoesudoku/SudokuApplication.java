@@ -9,9 +9,12 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 /**
+
  * Main application class for the Sudoku game.
  * This class handles the initial setup and launch of the user interface.
  * It loads the welcome menu and sets an icon for the application window.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class SudokuApplication extends Application {
 

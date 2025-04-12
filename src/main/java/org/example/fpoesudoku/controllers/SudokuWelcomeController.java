@@ -12,6 +12,8 @@ import java.io.IOException;
 /**
  * Controller class for the welcome menu of the Sudoku game.
  * Displays an introductory description and transitions to the main game interface.
+ *  @author Brandon Lasprilla Aristizabal
+ *  @author Juan Miguel Manjarrez Zuluaga
  */
 public class SudokuWelcomeController {
 
